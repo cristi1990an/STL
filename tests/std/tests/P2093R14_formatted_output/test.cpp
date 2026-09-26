@@ -323,9 +323,10 @@ void test_print_optimizations() {
     **********/
 }
 
-void test_empty_string_view_console_ostream() {
+void test_noformat_console_ostream() {
     if constexpr (_Is_ordinary_literal_encoding_utf8()) {
         constexpr string_view empty_view{};
+        constexpr string_view nonempty_view{"ostream println"};
         test::win_console test_console{};
         FILE* const console_file_stream = test_console.get_file_stream();
         filebuf console_file_buffer{console_file_stream};
@@ -339,10 +340,15 @@ void test_empty_string_view_console_ostream() {
         const bool println_set_badbit = console_output.bad();
         console_output.clear();
 
+        println(console_output, nonempty_view);
+        const bool nonempty_println_set_badbit = console_output.bad();
+        console_output.clear();
+
         print(console_output, "ostream marker");
 
-        assert(!print_set_badbit && !println_set_badbit && test_console.get_console_line(0).empty()
-               && test_console.get_console_line(1) == L"ostream marker");
+        assert(!print_set_badbit && !println_set_badbit && !nonempty_println_set_badbit
+               && test_console.get_console_line(0).empty() && test_console.get_console_line(1) == L"ostream println"
+               && test_console.get_console_line(2) == L"ostream marker");
     }
 }
 
@@ -682,7 +688,7 @@ void test_empty_strings_and_newlines() {
 
 void all_tests() {
     test_print_optimizations();
-    test_empty_string_view_console_ostream();
+    test_noformat_console_ostream();
 
     test_invalid_code_points_console();
     test_invalid_code_points_file();

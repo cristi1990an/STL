@@ -214,13 +214,13 @@ ios_base::iostate _Do_on_maybe_unicode_console(
 template <int = 0>
 ios_base::iostate _Print_noformat_unicode(const _Add_newline _Add_nl, ostream& _Ostr, const string_view _Str) {
     const auto _Unicode_console = [&](const __std_unicode_console_handle _Console_handle) {
-        const __std_win_error _Console_print_result =
-            __std_print_to_unicode_console(_Console_handle, _Str.data(), _Str.size());
-        if (_Console_print_result != __std_win_error::_Success || _Add_nl == _Add_newline::_Nope) {
-            return _Console_print_result;
+        if (_Add_nl == _Add_newline::_Yes) {
+            return __std_print_to_unicode_console_with_newline(_Console_handle, _Str.data(), _Str.size());
         }
 
-        return __std_print_newline_only_to_unicode_console(_Console_handle);
+        const __std_win_error _Console_print_result =
+            __std_print_to_unicode_console(_Console_handle, _Str.data(), _Str.size());
+        return _Console_print_result;
     };
 
     const auto _Fallback = [&] { return _STD _Print_noformat_nonunicode(_Add_nl, _Ostr, _Str); };
