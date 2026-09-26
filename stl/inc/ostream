@@ -84,16 +84,19 @@ ios_base::iostate _Print_noformat_nonunicode(const _Add_newline _Add_nl, ostream
     // constructed.
     ios_base::iostate _State = ios_base::goodbit;
 
+    string _Output_str;
+    string_view _Output = _Str;
+    if (_Add_nl == _Add_newline::_Yes) {
+        _Output_str.assign(_Str);
+        _Output_str.push_back('\n');
+        _Output = _Output_str;
+    }
+
     _TRY_IO_BEGIN
-    const auto _Characters_written       = _Ostr.rdbuf()->sputn(_Str.data(), static_cast<streamsize>(_Str.size()));
-    const bool _Was_insertion_successful = static_cast<size_t>(_Characters_written) == _Str.size();
+    const auto _Characters_written = _Ostr.rdbuf()->sputn(_Output.data(), static_cast<streamsize>(_Output.size()));
+    const bool _Was_insertion_successful = static_cast<size_t>(_Characters_written) == _Output.size();
     if (!_Was_insertion_successful) {
         _State |= ios_base::badbit;
-    } else if (_Add_nl == _Add_newline::_Yes) {
-        const bool _Was_newline_insertion_successful = _Ostr.rdbuf()->sputc('\n') == '\n';
-        if (!_Was_newline_insertion_successful) {
-            _State |= ios_base::badbit;
-        }
     }
     _CATCH_IO_(ios_base, _Ostr)
 
