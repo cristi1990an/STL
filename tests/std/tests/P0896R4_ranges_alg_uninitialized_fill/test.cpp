@@ -146,12 +146,20 @@ struct memset_test {
 
 using test_range = test::range<test::fwd, int_wrapper, test::Sized::no, test::CanDifference::no, test::Common::no,
     test::CanCompare::yes, test::ProxyRef::no>;
+using sized_noncommon_random_access_range = test::range<test::random, int_wrapper, test::Sized::yes,
+    test::CanDifference::no, test::Common::no, test::CanCompare::yes, test::ProxyRef::no>;
+static_assert(ranges::random_access_range<sized_noncommon_random_access_range>
+              && ranges::sized_range<sized_noncommon_random_access_range>
+              && !ranges::common_range<sized_noncommon_random_access_range>
+              && !sized_sentinel_for<ranges::sentinel_t<sized_noncommon_random_access_range>,
+                  ranges::iterator_t<sized_noncommon_random_access_range>>);
 
 int main() {
     // The algorithm is oblivious to non-required category, size, difference. It _is_ sensitive to proxyness in that it
     // requires non-proxy references for the input range.
 
     instantiator::call<test_range>();
+    instantiator::call<sized_noncommon_random_access_range>();
     throwing_test::call<test_range>();
     memset_test::call();
 }

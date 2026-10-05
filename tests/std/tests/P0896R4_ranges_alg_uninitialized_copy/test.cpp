@@ -274,6 +274,13 @@ using test_input  = test::range<test::input, int_wrapper, test::Sized::no, test:
     test::CanCompare::no, IsProxy>;
 using test_output = test::range<test::fwd, int_wrapper, test::Sized::no, test::CanDifference::no, test::Common::no,
     test::CanCompare::yes, test::ProxyRef::no>;
+using sized_noncommon_random_access_range = test::range<test::random, int_wrapper, test::Sized::yes,
+    test::CanDifference::no, test::Common::no, test::CanCompare::yes, test::ProxyRef::no>;
+static_assert(ranges::random_access_range<sized_noncommon_random_access_range>
+              && ranges::sized_range<sized_noncommon_random_access_range>
+              && !ranges::common_range<sized_noncommon_random_access_range>
+              && !sized_sentinel_for<ranges::sentinel_t<sized_noncommon_random_access_range>,
+                  ranges::iterator_t<sized_noncommon_random_access_range>>);
 
 int main() {
     // The algorithm is oblivious to non-required category, size, difference, and "proxyness" of the input range. It
@@ -281,6 +288,7 @@ int main() {
 
     instantiator::call<test_input<test::ProxyRef::no>, test_output>();
     instantiator::call<test_input<test::ProxyRef::yes>, test_output>();
+    instantiator::call<sized_noncommon_random_access_range, sized_noncommon_random_access_range>();
     throwing_test::call<test_input<test::ProxyRef::no>, test_output>();
     throwing_test::call<test_input<test::ProxyRef::yes>, test_output>();
     memcpy_test::call();

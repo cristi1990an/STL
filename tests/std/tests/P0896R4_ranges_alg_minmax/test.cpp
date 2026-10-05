@@ -310,6 +310,8 @@ constexpr void mm_element_constexpr_tests() {
 
     mm_element::call<range<bidirectional_iterator_tag, E, Sized::no, CanDifference::no, Common::yes, CanCompare::yes,
         ProxyRef::yes>>();
+    mm_element::call<range<random_access_iterator_tag, E, Sized::yes, CanDifference::no, Common::no, CanCompare::yes,
+        ProxyRef::yes>>();
     mm_element::call<range<random_access_iterator_tag, E, Sized::yes, CanDifference::yes, Common::yes, CanCompare::yes,
         ProxyRef::yes>>();
     mm_element::call<range<contiguous_iterator_tag, E, Sized::yes, CanDifference::yes, Common::yes, CanCompare::yes,
@@ -332,6 +334,8 @@ constexpr void mm_constexpr_tests() {
     mm::call<range<fwd, E, Sized::yes, CanDifference::yes, Common::yes, CanCompare::yes, ProxyRef::no>>();
 
     mm::call<range<bidirectional_iterator_tag, E, Sized::no, CanDifference::no, Common::yes, CanCompare::yes,
+        ProxyRef::yes>>();
+    mm::call<range<random_access_iterator_tag, E, Sized::yes, CanDifference::no, Common::no, CanCompare::yes,
         ProxyRef::yes>>();
     mm::call<range<random_access_iterator_tag, E, Sized::yes, CanDifference::yes, Common::yes, CanCompare::yes,
         ProxyRef::yes>>();

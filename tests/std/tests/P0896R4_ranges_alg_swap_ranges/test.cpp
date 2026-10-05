@@ -97,6 +97,15 @@ constexpr void run_tests() {
     instantiator::call<test_range<contiguous, ProxyRef::no>, test_range<input, ProxyRef::yes>>();
 
     instantiator::call<test_range<contiguous, ProxyRef::no>, test_range<contiguous, ProxyRef::no>>();
+
+    using sized_noncommon_random_access_range =
+        range<random, int, Sized::yes, CanDifference::no, Common::no, CanCompare::yes, ProxyRef::no>;
+    static_assert(ranges::random_access_range<sized_noncommon_random_access_range>
+                  && ranges::sized_range<sized_noncommon_random_access_range>
+                  && !ranges::common_range<sized_noncommon_random_access_range>
+                  && !sized_sentinel_for<ranges::sentinel_t<sized_noncommon_random_access_range>,
+                      ranges::iterator_t<sized_noncommon_random_access_range>>);
+    instantiator::call<sized_noncommon_random_access_range, sized_noncommon_random_access_range>();
 }
 
 int main() {
