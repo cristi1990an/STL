@@ -341,6 +341,52 @@ constexpr void test_compiletime_destroy_variants() {
 }
 static_assert((test_compiletime_destroy_variants(), true));
 
+struct destroy_range_sentinel {
+    int* last;
+
+    friend constexpr bool operator==(int* first, destroy_range_sentinel sent) noexcept {
+        return first == sent.last;
+    }
+    friend constexpr bool operator==(destroy_range_sentinel sent, int* first) noexcept {
+        return first == sent.last;
+    }
+};
+
+template <bool NothrowSize>
+struct destroy_range_with_counting_size {
+    int* first;
+    int* last;
+    int* size_calls;
+
+    int* begin() const noexcept {
+        return first;
+    }
+    destroy_range_sentinel end() const noexcept {
+        return {last};
+    }
+    size_t size() const noexcept(NothrowSize) {
+        ++*size_calls;
+        return static_cast<size_t>(last - first);
+    }
+};
+
+template <bool NothrowSize>
+void test_destroy_range_distance_noexcept() {
+    int values[3]{};
+    int size_calls = 0;
+    destroy_range_with_counting_size<NothrowSize> range{values, values + 3, &size_calls};
+
+    static_assert(ranges::random_access_range<decltype(range)>);
+    static_assert(ranges::sized_range<decltype(range)>);
+    static_assert(!sized_sentinel_for<ranges::sentinel_t<decltype(range)>, ranges::iterator_t<decltype(range)>>);
+    static_assert(noexcept(ranges::size(range)) == NothrowSize);
+    static_assert(noexcept(ranges::distance(range)) == NothrowSize);
+    static_assert(noexcept(ranges::destroy(range)));
+
+    assert(ranges::destroy(range) == values + 3);
+    assert(size_calls == (NothrowSize ? 1 : 0));
+}
+
 template <class T, bool Construct = false, bool Destroy = false>
 struct Alloc {
     using value_type = T;
@@ -682,6 +728,9 @@ constexpr bool test_construct_at_array() {
 }
 
 int main() {
+    test_destroy_range_distance_noexcept<false>();
+    test_destroy_range_distance_noexcept<true>();
+
     test_runtime(1234);
     test_runtime(string("hello world"));
     test_runtime(string("hello to some really long world that certainly doesn't fit in SSO"));
